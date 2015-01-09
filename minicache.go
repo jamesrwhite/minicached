@@ -1,5 +1,5 @@
-// minicache is a work in progress in memory caching system that aims
-// to be wire compatible with memcached
+// minicache is a work in progress in-memory caching system that aims
+// to be wire compatible with memcached.
 package main
 
 import (
