@@ -8,6 +8,7 @@ import (
 	"os"
 	"log"
 	"fmt"
+	"strings"
 )
 
 func main() {
@@ -38,7 +39,24 @@ func main() {
 
 			// Handle each line (command)
 			for scanner.Scan() {
-				fmt.Println("[COMMAND] " + scanner.Text())
+				// Split the command up by spaces into a slice
+				input := strings.Split(scanner.Text(), " ")
+
+				// Get the command
+				command := strings.ToLower(input[0])
+
+				// Switch on the type of command
+				switch {
+				case command == "get":
+					// Check if a key was passed
+					if len(input) == 2 {
+						fmt.Println("[GET] " + input[1])
+					} else {
+						fmt.Println("[ERROR] No key specified")
+					}
+				case true:
+					fmt.Println("[ERROR] Unknown command")
+				}
 			}
 
 			// Print out errors to stderr
