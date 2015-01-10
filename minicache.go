@@ -43,19 +43,21 @@ func main() {
 				input := strings.Split(scanner.Text(), " ")
 
 				// Get the command
-				command := strings.ToLower(input[0])
+				command := input[0]
 
 				// Switch on the type of command
 				switch {
 				case command == "get":
-					// Check if a key was passed
+					// Check if a key was passed, if so try and retrieve it
 					if len(input) == 2 {
-						fmt.Println("[GET] " + input[1])
+						fmt.Fprintln(client, "VALUE " + command + " 0 4")
+						fmt.Fprintln(client, "test")
+						fmt.Fprintln(client, "END")
 					} else {
-						fmt.Println("[ERROR] No key specified")
+						fmt.Fprintln(client, "ERROR")
 					}
 				case true:
-					fmt.Println("[ERROR] Unknown command")
+					fmt.Fprintln(client, "ERROR")
 				}
 			}
 
