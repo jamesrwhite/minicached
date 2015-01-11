@@ -1,13 +1,13 @@
-// minicache is a work in progress in-memory caching system that aims
-// to be wire compatible with memcached.
+// minicache is a work in progress in-memory caching system
+// featuring a similar text based protocol to memcached/redis
 package main
 
 import (
-	"net"
 	"bufio"
-	"os"
-	"log"
 	"fmt"
+	"log"
+	"net"
+	"os"
 	"strings"
 )
 
@@ -50,7 +50,7 @@ func main() {
 				case command == "get":
 					// Check if a key was passed, if so try and retrieve it
 					if len(input) == 2 {
-						fmt.Fprintln(client, "VALUE " + command + " 0 4")
+						fmt.Fprintln(client, "VALUE "+command+" 0 4")
 						fmt.Fprintln(client, "test")
 						fmt.Fprintln(client, "END")
 					} else {
