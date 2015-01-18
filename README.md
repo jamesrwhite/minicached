@@ -12,8 +12,13 @@ featuring a similar text based protocol to memcached/redis
 Trying ::1...
 Connected to localhost.
 Escape character is '^]'.
-get test
-VALUE get 0 4
+get a
+END
+set a 0 0 4
+test
+STORED
+get a
+VALUE a 0 4
 test
 END
 ````
