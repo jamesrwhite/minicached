@@ -35,9 +35,11 @@ type Record struct {
 }
 	
 const STATE_DEFAULT uint8 = 1
-const STATE_COMMAND_GET uint8 = 2
-const STATE_COMMAND_SET uint8 = 3
-const STATE_EXPECTING_VALUE uint8 = 4
+const STATE_EXPECTING_VALUE uint8 = 2
+
+const STATE_COMMAND_GET uint8 = 3
+const STATE_COMMAND_SET uint8 = 4
+const STATE_COMMAND_DELETE uint8 = 5
 
 var ticker = time.NewTicker(time.Second * 1)
 
@@ -60,9 +62,7 @@ func main() {
 
 	go func() {
 		for range ticker.C {
-			for key, value := range datastore {
-				fmt.Println(key, value)
-			}
+			fmt.Println(datastore)
 		}
 	}()
 
@@ -110,6 +110,8 @@ func main() {
 						client.State = STATE_COMMAND_GET
 					case "set":
 						client.State = STATE_COMMAND_SET
+					case "delete":
+						client.State = STATE_COMMAND_DELETE
 					}
 				}
 
@@ -152,7 +154,7 @@ func main() {
 						// Reset the clients state
 						client.Reset()
 					}
-				// get key1 [key2 .... keyn]
+				// get [key1 ... keyn]
 				case STATE_COMMAND_GET:
 					// Check if a key was passed, if so try and retrieve it
 					if len(client.Input) == 2 {
@@ -175,7 +177,7 @@ func main() {
 
 					// Reset the clients state regardless off success/failure
 					client.Reset()
-				// set key [flags] [exptime] length [casunique] [noreply]
+				// set [key] [flags] [exptime] [length] [casunique] [noreply]
 				case STATE_COMMAND_SET:
 					// Check the right number of arguments are passed
 					if len(client.Input) == 5 {
@@ -214,6 +216,30 @@ func main() {
 						// Reset the clients state
 						client.Reset()
 					}
+				// delete [key]
+				case STATE_COMMAND_DELETE:
+					// Check if a key was passed, if so try and retrieve it
+					if len(client.Input) == 2 {
+						// Get the key
+						key := client.Input[1]
+
+						// Look up the record in our datastore
+						record := datastore[key]
+
+						// Did it exist? If so 'delete' it
+						// TODO: can you actually delete from a map?
+						if record != nil {
+							datastore[key] = nil
+						}
+
+						// TODO: what is the memcached response here?
+						fmt.Fprintln(connection, "DELETED")
+					} else {
+						fmt.Fprintln(connection, "CLIENT_ERROR")
+					}
+
+					// Reset the clients state regardless off success/failure
+					client.Reset()
 				}
 			}
 
