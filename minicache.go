@@ -164,6 +164,7 @@ func main() {
 						client.Reset()
 					}
 				// get [key1 ... keyn]
+				// TODO: handling multiple key gets
 				case STATE_COMMAND_GET:
 					// Check if a key was passed, if so try and retrieve it
 					if len(client.Input) == 2 {
