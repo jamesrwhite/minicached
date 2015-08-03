@@ -1,13 +1,18 @@
 // minicache is a work in progress in-memory caching system
-// featuring a similar text based protocol to memcached/redis
+// featuring a similar text based protocol to memcached
 package main
+
+// TODO:
+// - TTL handling
+// - casunique?
+// - noreply?
 
 import (
 	"bufio"
 	"fmt"
 	"log"
 	"net"
-	"os"
+	// "os"
 	"strconv"
 	"strings"
 	"time"
@@ -28,7 +33,7 @@ type Record struct {
 	Ttl    int64
 	Length int64
 }
-
+	
 const STATE_DEFAULT uint8 = 1
 const STATE_COMMAND_GET uint8 = 2
 const STATE_COMMAND_SET uint8 = 3
@@ -48,14 +53,14 @@ func main() {
 	defer server.Close()
 
 	// Our datastore..
-	data := make(map[string]string)
+	datastore := make(map[string]*Record)
 
 	// A list of active clients
 	clients := make(map[string]*Client)
 
 	go func() {
 		for range ticker.C {
-			for key, value := range clients {
+			for key, value := range datastore {
 				fmt.Println(key, value)
 			}
 		}
@@ -70,8 +75,8 @@ func main() {
 		}
 
 		// Handle the connection in a new goroutine.
-		// The loop then returns to accepting, so that
-		// multiple connections may be served concurrently.
+		// The loop then returns to accepting new connections,
+		// so that multiple connections may be served concurrently.
 		go func(connection net.Conn) {
 			// Create the client and store it
 			client := &Client{
@@ -115,7 +120,7 @@ func main() {
 					// If the value isn't set then set it
 					if client.Record.Value == "" {
 						client.Record.Value = scanner.Text()
-						// Otherwise append to it
+					// Otherwise append to it
 					} else {
 						client.Record.Value += scanner.Text()
 					}
@@ -125,18 +130,18 @@ func main() {
 					// Count the length of the value minus the trailing \r\n
 					valueLength := int64(len(client.Record.Value)) - 2
 
-					// If the data is same or greater than the expected length
+					// If the datastore is same or greater than the expected length
 					// we are done with this op
 					if valueLength >= client.Record.Length {
 						// If it's the same length we can try and store it
 						if valueLength == client.Record.Length {
 							// Store the value
-							data[client.Record.Key] = client.Record.Value
+							datastore[client.Record.Key] = client.Record
 
 							// Inform the client we have stored the value
 							// TODO: error handling here
 							fmt.Fprintln(connection, "STORED")
-							// Otherwise the client has messed up
+						// Otherwise the client has messed up
 						} else {
 							// Inform the client that they messed up
 							fmt.Fprintln(connection, "CLIENT_ERROR")
@@ -144,9 +149,8 @@ func main() {
 							fmt.Fprintln(connection, "ERROR")
 						}
 
-						// Reset the state and record
-						client.State = STATE_DEFAULT
-						client.Record = nil
+						// Reset the clients state
+						client.Reset()
 					}
 				// get key1 [key2 .... keyn]
 				case STATE_COMMAND_GET:
@@ -155,22 +159,22 @@ func main() {
 						// Get the key
 						key := client.Input[1]
 
-						// Look up the key in our datastore
-						value := data[key]
+						// Look up the record in our datastore
+						record := datastore[key]
 
 						// Did it exist?
-						if value != "" {
-							fmt.Fprintln(connection, fmt.Sprintf("VALUE %s 0 %d", key, len(value)))
-							fmt.Fprintln(connection, value)
+						if record != nil {
+							fmt.Fprintln(connection, fmt.Sprintf("VALUE %s %d %d", record.Key, record.Flags, record.Length))
+							fmt.Fprint(connection, record.Value)
 						}
 
 						fmt.Fprintln(connection, "END")
 					} else {
-						fmt.Fprintln(connection, "ERROR")
+						fmt.Fprintln(connection, "CLIENT_ERROR")
 					}
 
 					// Reset the clients state regardless off success/failure
-					client.State = STATE_DEFAULT
+					client.Reset()
 				// set key [flags] [exptime] length [casunique] [noreply]
 				case STATE_COMMAND_SET:
 					// Check the right number of arguments are passed
@@ -178,35 +182,53 @@ func main() {
 						// Get the key name
 						client.Record.Key = client.Input[1]
 
-						// Get any flags, TODO: handle errors
-						client.Record.Flags, _ = strconv.ParseInt(client.Input[2], 10, 64)
+						// Get any flags
+						client.Record.Flags, err = strconv.ParseInt(client.Input[2], 10, 64)
 
-						// Get the key TTL, TODO: handle errors
-						client.Record.Ttl, _ = strconv.ParseInt(client.Input[3], 10, 64)
+						if err != nil {
+							fmt.Fprintln(connection, "CLIENT_ERROR ", err)
+							break
+						}
 
-						// Get the value length, TODO: handle errors
-						client.Record.Length, _ = strconv.ParseInt(client.Input[4], 10, 64)
+						// Get the key TTL
+						client.Record.Ttl, err = strconv.ParseInt(client.Input[3], 10, 64)
 
-						// Note: the optional casunique and noreply params are ignored for now
+						if err != nil {
+							fmt.Fprintln(connection, "CLIENT_ERROR ", err)
+							break
+						}
+
+						// Get the value length
+						client.Record.Length, err = strconv.ParseInt(client.Input[4], 10, 64)
+
+						if err != nil {
+							fmt.Fprintln(connection, "CLIENT_ERROR ", err)
+							break
+						}
 
 						// Set that we are expecting a value
 						client.State = STATE_EXPECTING_VALUE
-
-						// Print out a newline while we wait for the client value
-						fmt.Fprint(connection, "\r\n")
 					} else {
-						fmt.Fprintln(connection, "ERROR")
+						fmt.Fprintln(connection, "ERROR ", err)
 
 						// Reset the clients state
-						client.State = STATE_DEFAULT
+						client.Reset()
 					}
 				}
 			}
 
 			// Print out errors to stderr
 			if err := scanner.Err(); err != nil {
-				fmt.Fprintln(os.Stderr, "[ERROR] ", err)
+				fmt.Fprintln(connection, "ERROR ", err)
 			}
 		}(connection)
 	}
+}
+
+// Reset a clients state to what it would be on first connection
+func (client *Client) Reset() {
+	client.State = STATE_DEFAULT
+	client.Input = []string{}
+	client.Command = ""
+	client.Record =  &Record{}
 }
