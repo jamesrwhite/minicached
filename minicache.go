@@ -6,6 +6,7 @@ package main
 // - TTL handling
 // - casunique?
 // - noreply?
+// - Investigate how memcached handles concurrency/locking
 
 import (
 	"bufio"
