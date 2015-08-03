@@ -41,6 +41,8 @@ const STATE_EXPECTING_VALUE uint8 = 2
 const STATE_COMMAND_GET uint8 = 3
 const STATE_COMMAND_SET uint8 = 4
 const STATE_COMMAND_DELETE uint8 = 5
+const STATE_COMMAND_QUIT uint8 = 6
+const STATE_COMMAND_FLUSHALL uint8 = 7
 
 var ticker = time.NewTicker(time.Second * 1)
 
@@ -89,7 +91,11 @@ func main() {
 			}
 			clients[connection.RemoteAddr().String()] = client
 
-			// Ensure the client conncetion closes once we're done
+			// Ensure the client is tidied up once they're done
+			defer func(clients map[string]*Client, id string) {
+				// TODO: delete from map properly
+				clients[id] = nil
+			}(clients, client.Id)
 			defer connection.Close()
 
 			// Create a new scanner for the client input
@@ -113,6 +119,8 @@ func main() {
 						client.State = STATE_COMMAND_SET
 					case "delete":
 						client.State = STATE_COMMAND_DELETE
+					case "flush_all":
+						client.State = STATE_COMMAND_FLUSHALL
 					}
 				}
 
@@ -241,6 +249,17 @@ func main() {
 
 					// Reset the clients state regardless off success/failure
 					client.Reset()
+				// quit
+				case STATE_COMMAND_QUIT:
+					// Not much to do here atm..
+					// Eventually we will do logging etc
+				// flushall
+				case STATE_COMMAND_FLUSHALL:
+					// TODO: is there a more efficient way to empty a map?
+					datastore = make(map[string]*Record)
+
+					// TODO: what does memcached return here?
+					fmt.Fprintln(connection, "END")
 				}
 			}
 
