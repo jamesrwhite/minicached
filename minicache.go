@@ -225,7 +225,7 @@ func main() {
 						// Reset the clients state
 						client.Reset()
 					}
-				// delete [key]
+				// delete [key] [noreply]
 				case STATE_COMMAND_DELETE:
 					// Check if a key was passed, if so try and retrieve it
 					if len(client.Input) == 2 {
@@ -238,10 +238,11 @@ func main() {
 						// Did it exist? If so 'delete' it
 						if record != nil {
 							delete(datastore, key)
+							fmt.Fprintln(connection, "DELETED")
+						} else {
+							fmt.Fprintln(connection, "NOT_FOUND")
 						}
 
-						// TODO: what is the memcached response here?
-						fmt.Fprintln(connection, "DELETED")
 					} else {
 						fmt.Fprintln(connection, "CLIENT_ERROR")
 					}
