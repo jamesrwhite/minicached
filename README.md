@@ -1,7 +1,15 @@
 # minicache
 
 minicache is a work in progress in-memory caching system
-featuring a similar text based protocol to memcached/redis
+featuring a similar text based protocol to memcached and
+should be usable from most existing memcached libraries
+
+## Commands implemented
+
+- get
+- set
+- delete
+- flush_all
 
 ## Demo
 
