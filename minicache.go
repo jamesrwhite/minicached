@@ -253,13 +253,11 @@ func main() {
 				case STATE_COMMAND_QUIT:
 					// Not much to do here atm..
 					// Eventually we will do logging etc
-				// flushall
+				// flushall [delay]
+				// TODO: implement delay
 				case STATE_COMMAND_FLUSHALL:
-					// TODO: is there a more efficient way to empty a map?
 					datastore = make(map[string]*Record)
-
-					// TODO: what does memcached return here?
-					fmt.Fprintln(connection, "END")
+					fmt.Fprintln(connection, "OK")
 				}
 			}
 
