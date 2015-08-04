@@ -93,8 +93,7 @@ func main() {
 
 			// Ensure the client is tidied up once they're done
 			defer func(clients map[string]*Client, id string) {
-				// TODO: delete from map properly
-				clients[id] = nil
+				delete(clients, id)
 			}(clients, client.Id)
 			defer connection.Close()
 
@@ -237,9 +236,8 @@ func main() {
 						record := datastore[key]
 
 						// Did it exist? If so 'delete' it
-						// TODO: can you actually delete from a map?
 						if record != nil {
-							datastore[key] = nil
+							delete(datastore, key)
 						}
 
 						// TODO: what is the memcached response here?
