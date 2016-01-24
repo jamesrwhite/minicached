@@ -265,7 +265,7 @@ func main() {
 				// flush_all [delay]
 				case STATE_COMMAND_FLUSH_ALL:
 					// Check if a delay was passed
-					if len(client.Input) == 2 {
+					if len(client.Input) == 2 && client.Input[1] != "" {
 						delay, err := strconv.ParseInt(client.Input[1], 10, 64)
 
 						if err != nil {
