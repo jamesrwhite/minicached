@@ -42,7 +42,7 @@ const STATE_COMMAND_GET uint8 = 3
 const STATE_COMMAND_SET uint8 = 4
 const STATE_COMMAND_DELETE uint8 = 5
 const STATE_COMMAND_QUIT uint8 = 6
-const STATE_COMMAND_FLUSHALL uint8 = 7
+const STATE_COMMAND_FLUSH_ALL uint8 = 7
 
 var ticker = time.NewTicker(time.Second * 1)
 var clients map[string]*Client
@@ -122,7 +122,7 @@ func main() {
 					case "delete":
 						client.State = STATE_COMMAND_DELETE
 					case "flush_all":
-						client.State = STATE_COMMAND_FLUSHALL
+						client.State = STATE_COMMAND_FLUSH_ALL
 					case "quit":
 						client.State = STATE_COMMAND_QUIT
 					default:
@@ -262,8 +262,8 @@ func main() {
 				case STATE_COMMAND_QUIT:
 					// Not much to do here atm..
 					// Eventually we will do logging etc
-				// flushall [delay]
-				case STATE_COMMAND_FLUSHALL:
+				// flush_all [delay]
+				case STATE_COMMAND_FLUSH_ALL:
 					// Check if a delay was passed
 					if len(client.Input) == 2 {
 						delay, err := strconv.ParseInt(client.Input[1], 10, 64)
