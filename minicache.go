@@ -95,10 +95,10 @@ func main() {
 			clients[connection.RemoteAddr().String()] = client
 
 			// Ensure the client is tidied up once they're done
-			defer func(clients map[string]*Client, id string) {
+			defer func(connection net.Conn, clients map[string]*Client, id string) {
 				delete(clients, id)
-			}(clients, client.Id)
-			defer connection.Close()
+				connection.Close()
+			}(connection, clients, client.Id)
 
 			// Create a new scanner for the client input
 			scanner := bufio.NewScanner(connection)
