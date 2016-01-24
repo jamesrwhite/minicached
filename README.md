@@ -1,8 +1,7 @@
 # minicache
 
 minicache is a work in progress in-memory caching system
-featuring a similar text based protocol to memcached and
-should be usable from most existing memcached libraries
+featuring a similar [text based protocol](https://github.com/memcached/memcached/blob/master/doc/protocol.txt) to [memcached](http://memcached.org/) and should be usable from most existing memcached libraries
 
 ## Commands implemented
 
