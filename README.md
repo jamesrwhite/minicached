@@ -34,4 +34,4 @@ END
 ## Tests
 
 - `composer install`
-- `vendor/bin/phpunit acceptance.php`
+- `vendor/bin/phpunit tests/acceptance.php`
