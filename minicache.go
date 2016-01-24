@@ -123,6 +123,8 @@ func main() {
 						client.State = STATE_COMMAND_DELETE
 					case "flush_all":
 						client.State = STATE_COMMAND_FLUSHALL
+					case "quit":
+						client.State = STATE_COMMAND_QUIT
 					default:
 						fmt.Fprintln(connection, "ERROR")
 						client.Reset()
