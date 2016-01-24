@@ -103,16 +103,23 @@ func main() {
 			// Create a new scanner for the client input
 			scanner := bufio.NewScanner(connection)
 
+			fmt.Println("[CONNECTION] new connection: ", connection)
+
 			// Handle each line (command)
 			for scanner.Scan() {
 				// Split the client input up based on spaces
 				client.Input = strings.Split(scanner.Text(), " ")
+
+				fmt.Println("[CLIENT] input received: ", client.Input)
+				fmt.Println("[CLIENT] pre parse state: ", client.State)
 
 				// Determine the clients state based on the command unless
 				// we're waiting for a value
 				if client.State != STATE_EXPECTING_VALUE {
 					// Get the command
 					client.Command = client.Input[0]
+
+					fmt.Println("[CLIENT] setting command: ", client.Command)
 
 					switch client.Command {
 					case "get":
@@ -126,10 +133,13 @@ func main() {
 					case "quit":
 						client.State = STATE_COMMAND_QUIT
 					default:
+						fmt.Println("[CLIENT] unknown state: ", client.State)
 						fmt.Fprintln(connection, "ERROR")
 						client.Reset()
 						continue
 					}
+
+					fmt.Println("[CLIENT] post parse state: ", client.State)
 				}
 
 				// Switch on the type of command
@@ -288,6 +298,7 @@ func main() {
 
 			// Print out errors to stderr
 			if err := scanner.Err(); err != nil {
+				fmt.Println("[SERVER] error ", err)
 				fmt.Fprintln(connection, "ERROR ", err)
 				client.Reset()
 			}
@@ -297,6 +308,8 @@ func main() {
 
 // Reset a clients state to what it would be on first connection
 func (client *Client) Reset() {
+	fmt.Println("[CLIENT] resetting client")
+
 	client.State = STATE_DEFAULT
 	client.Input = []string{}
 	client.Command = ""
