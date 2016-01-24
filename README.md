@@ -30,3 +30,8 @@ VALUE a 0 4
 test
 END
 ````
+
+## Tests
+
+- `composer install`
+- `vendor/bin/phpunit acceptance.php`

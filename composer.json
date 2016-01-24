@@ -1,0 +1,12 @@
+{
+    "name": "jamesrwhite/minicache",
+    "require-dev": {
+        "phpunit/phpunit": "^5.1"
+    },
+    "authors": [
+        {
+            "name": "James White",
+            "email": "dev.jameswhite@gmail.com"
+        }
+    ]
+}
