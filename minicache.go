@@ -29,7 +29,7 @@ type Client struct {
 
 type Record struct {
 	Key    string
-	Value  string
+	Value  []byte
 	Flags  int64
 	Ttl    int64
 	Length int64
@@ -135,14 +135,14 @@ func main() {
 				// Are we expecting a value from a set command?
 				case STATE_EXPECTING_VALUE:
 					// If the value isn't set then set it
-					if client.Record.Value == "" {
-						client.Record.Value = scanner.Text()
+					if len(client.Record.Value) == 0 {
+						client.Record.Value = scanner.Bytes()
 					// Otherwise append to it
 					} else {
-						client.Record.Value += scanner.Text()
+						client.Record.Value = append(client.Record.Value, scanner.Bytes()...)
 					}
 
-					client.Record.Value += "\r\n"
+					client.Record.Value = append(client.Record.Value, []byte{'\r', '\n'}...)
 
 					// Count the length of the value minus the trailing \r\n
 					valueLength := int64(len(client.Record.Value)) - 2
@@ -183,7 +183,7 @@ func main() {
 						// Did it exist?
 						if record != nil {
 							fmt.Fprintln(connection, fmt.Sprintf("VALUE %s %d %d", record.Key, record.Flags, record.Length))
-							fmt.Fprint(connection, record.Value)
+							fmt.Fprint(connection, string(record.Value[:]))
 						}
 
 						fmt.Fprintln(connection, "END")
