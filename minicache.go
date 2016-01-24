@@ -262,7 +262,8 @@ func main() {
 				case STATE_COMMAND_QUIT:
 					// Not much to do here atm..
 					// Eventually we will do logging etc
-				// flush_all [delay]
+				// flush_all [delay] [noreply]
+				// TODO: handle noreply
 				case STATE_COMMAND_FLUSH_ALL:
 					// Check if a delay was passed
 					if len(client.Input) == 2 && client.Input[1] != "" {
