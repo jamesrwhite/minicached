@@ -257,8 +257,20 @@ func main() {
 					// Not much to do here atm..
 					// Eventually we will do logging etc
 				// flushall [delay]
-				// TODO: implement delay
 				case STATE_COMMAND_FLUSHALL:
+					// Check if a delay was passed
+					if len(client.Input) == 2 {
+						delay, err := strconv.ParseInt(client.Input[1], 10, 64)
+
+						if err != nil {
+							fmt.Fprintln(connection, "CLIENT_ERROR ", err)
+							break
+						}
+
+						time.Sleep(time.Duration(delay) * time.Second)
+					}
+
+					// Reset the datastore
 					datastore = make(map[string]*Record)
 					fmt.Fprintln(connection, "OK")
 				}
