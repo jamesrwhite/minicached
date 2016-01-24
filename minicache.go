@@ -125,6 +125,7 @@ func main() {
 						client.State = STATE_COMMAND_FLUSHALL
 					default:
 						fmt.Fprintln(connection, "ERROR")
+						client.Reset()
 						continue
 					}
 				}
@@ -190,7 +191,6 @@ func main() {
 						fmt.Fprintln(connection, "CLIENT_ERROR")
 					}
 
-					// Reset the clients state regardless off success/failure
 					client.Reset()
 				// set [key] [flags] [exptime] [length] [casunique] [noreply]
 				case STATE_COMMAND_SET:
@@ -205,6 +205,7 @@ func main() {
 
 						if err != nil {
 							fmt.Fprintln(connection, "CLIENT_ERROR ", err)
+							client.Reset()
 							break
 						}
 
@@ -213,6 +214,7 @@ func main() {
 
 						if err != nil {
 							fmt.Fprintln(connection, "CLIENT_ERROR ", err)
+							client.Reset()
 							break
 						}
 
@@ -221,6 +223,7 @@ func main() {
 
 						if err != nil {
 							fmt.Fprintln(connection, "CLIENT_ERROR ", err)
+							client.Reset()
 							break
 						}
 
@@ -228,8 +231,6 @@ func main() {
 						client.State = STATE_EXPECTING_VALUE
 					} else {
 						fmt.Fprintln(connection, "ERROR ", err)
-
-						// Reset the clients state
 						client.Reset()
 					}
 				// delete [key] [noreply]
@@ -254,7 +255,6 @@ func main() {
 						fmt.Fprintln(connection, "CLIENT_ERROR")
 					}
 
-					// Reset the clients state regardless off success/failure
 					client.Reset()
 				// quit
 				case STATE_COMMAND_QUIT:
@@ -268,6 +268,7 @@ func main() {
 
 						if err != nil {
 							fmt.Fprintln(connection, "CLIENT_ERROR ", err)
+							client.Reset()
 							break
 						}
 
@@ -277,12 +278,15 @@ func main() {
 					// Reset the datastore
 					datastore = make(map[string]*Record)
 					fmt.Fprintln(connection, "OK")
+
+					client.Reset()
 				}
 			}
 
 			// Print out errors to stderr
 			if err := scanner.Err(); err != nil {
 				fmt.Fprintln(connection, "ERROR ", err)
+				client.Reset()
 			}
 		}(connection)
 	}
