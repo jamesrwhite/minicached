@@ -195,7 +195,8 @@ func main() {
 				// set [key] [flags] [exptime] [length] [casunique] [noreply]
 				case STATE_COMMAND_SET:
 					// Check the right number of arguments are passed
-					if len(client.Input) == 7 {
+					// casunique and noreply are optional
+					if len(client.Input) == 5 {
 						// Get the key name
 						client.Record.Key = client.Input[1]
 
