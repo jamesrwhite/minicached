@@ -123,6 +123,9 @@ func main() {
 						client.State = STATE_COMMAND_DELETE
 					case "flush_all":
 						client.State = STATE_COMMAND_FLUSHALL
+					default:
+						fmt.Fprintln(connection, "ERROR")
+						continue
 					}
 				}
 
