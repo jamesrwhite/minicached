@@ -108,9 +108,9 @@ func main() {
 				// Split the client input up based on spaces
 				client.Input = strings.Split(scanner.Text(), " ")
 
-				// If we're in our default state then determine
-				// what command we're running
-				if client.State == STATE_DEFAULT {
+				// Determine the clients state based on the command unless
+				// we're waiting for a value
+				if client.State != STATE_EXPECTING_VALUE {
 					// Get the command
 					client.Command = client.Input[0]
 
