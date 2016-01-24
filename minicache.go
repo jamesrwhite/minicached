@@ -45,6 +45,8 @@ const STATE_COMMAND_QUIT uint8 = 6
 const STATE_COMMAND_FLUSHALL uint8 = 7
 
 var ticker = time.NewTicker(time.Second * 1)
+var clients map[string]*Client
+var datastore map[string]*Record
 
 func main() {
 	// Start the server on port 5268
@@ -58,11 +60,12 @@ func main() {
 	defer server.Close()
 
 	// Our datastore..
-	datastore := make(map[string]*Record)
+	datastore = make(map[string]*Record)
 
 	// A list of active clients
-	clients := make(map[string]*Client)
+	clients = make(map[string]*Client)
 
+	// Print out the datastore contents every second for debug
 	go func() {
 		for range ticker.C {
 			fmt.Println(datastore)
