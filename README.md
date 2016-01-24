@@ -10,6 +10,7 @@ should be usable from most existing memcached libraries
 - set
 - delete
 - flush_all
+- quit
 
 ## Demo
 
