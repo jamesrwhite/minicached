@@ -37,4 +37,12 @@ END
 ## Tests
 
 - `composer install`
-- `vendor/bin/phpunit tests/acceptance.php`
+- `make test`
+
+## Build
+
+- `make build`
+
+## Install
+
+- `make install`
