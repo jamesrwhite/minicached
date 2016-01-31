@@ -41,6 +41,9 @@ var clients map[string]*Client
 var store *memory.Store
 
 func Listen(port int) {
+	// Initialise the store
+	store = memory.Init()
+
 	// Start the server on port 5268
 	server, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 
@@ -50,9 +53,6 @@ func Listen(port int) {
 
 	// Ensure that the server closes
 	defer server.Close()
-
-	// Initialise the store
-	store = memory.Init()
 
 	// A list of active clients
 	clients = make(map[string]*Client)
