@@ -1,0 +1,3 @@
+package: github.com/jamesrwhite/minicached
+import:
+- package: github.com/Sirupsen/logrus
