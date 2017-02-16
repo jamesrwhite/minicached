@@ -1,5 +1,5 @@
 <?php
-require 'vendor/autoload.php';
+require 'composer-vendor/autoload.php';
 
 class MinicachedTest extends PHPUnit_Framework_TestCase
 {

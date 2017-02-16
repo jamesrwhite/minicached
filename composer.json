@@ -3,6 +3,9 @@
     "require-dev": {
         "phpunit/phpunit": "^5.1"
     },
+    "config": {
+        "vendor-dir": "composer-vendor"
+    },
     "authors": [
         {
             "name": "James White",

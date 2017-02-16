@@ -1,7 +1,7 @@
 test: build
 	nohup memcached &> /dev/null &
 	nohup ./minicached &> /dev/null &
-	vendor/bin/phpunit -v --debug --colors tests/acceptance.php
+	composer-vendor/bin/phpunit -v --debug --colors tests/acceptance.php
 	killall memcached
 	killall minicached
 

@@ -97,4 +97,4 @@ sftp-config.json
 
 ### PHP ###
 # Composer
-/vendor/
+/composer-vendor/
