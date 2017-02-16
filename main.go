@@ -4,8 +4,10 @@ package main
 
 import (
 	"github.com/jamesrwhite/minicached/server"
+	log "github.com/Sirupsen/logrus"
 )
 
 func main() {
+	log.SetLevel(log.DebugLevel)
 	server.Listen(5268)
 }

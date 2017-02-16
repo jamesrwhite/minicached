@@ -2,58 +2,48 @@ package memory
 
 import (
 	"sync"
+	"github.com/jamesrwhite/minicached/store"
 )
 
-type Store struct {
-	records map[string]*Record
-	// TODO: in certain situations can we only lock the record instead of the entire Store?
-	sync.RWMutex
-}
+var memoryStore = make(map[string]store.Record)
+var lock = sync.RWMutex{}
 
-type Record struct {
-	Key    string
-	Value  []byte
-	Flags  int64
-	Ttl    int64
-	Length int64
-}
+func Get(key string) (found bool, record store.Record) {
+	lock.RLock()
+	defer lock.RUnlock()
 
-func Init() *Store {
-	return &Store{
-		records: make(map[string]*Record),
-	}
-}
-
-func (s Store) Get(key string) *Record {
-	s.RLock()
-	defer s.RUnlock()
-
-	value, ok := s.records[key]
+	value, ok := memoryStore[key]
 
 	if ok {
-		return value
+		return true, value
 	}
 
-	return nil
+	return false, store.Record{}
 }
 
-func (s Store) Set(record *Record) {
-	s.Lock()
-	defer s.Unlock()
+func Set(key, value string, length, flags, ttl int64) {
+	lock.Lock()
+	defer lock.Unlock()
 
-	s.records[record.Key] = record
+	memoryStore[key] = store.Record{
+		Key: key,
+		Value: value,
+		Flags: flags,
+		Ttl: ttl,
+		Length: length,
+	}
 }
 
-func (s Store) Delete(key string) {
-	s.Lock()
-	defer s.Unlock()
+func Delete(key string) {
+	lock.Lock()
+	defer lock.Unlock()
 
-	delete(s.records, key)
+	delete(memoryStore, key)
 }
 
-func (s Store) Flush() {
-	s.Lock()
-	defer s.Unlock()
+func Flush() {
+	lock.Lock()
+	defer lock.Unlock()
 
-	s.records = make(map[string]*Record)
+	memoryStore = make(map[string]store.Record)
 }
