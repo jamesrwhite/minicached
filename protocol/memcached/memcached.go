@@ -16,7 +16,11 @@ func Process(serverClient *client.Client) (response string, err error) {
 	// we're in the state of waiting for a value
 	if serverClient.State != client.STATE_EXPECTING_VALUE {
 		// Set the command the client should be processing
-		serverClient.Command, _ = getCommand(serverClient.Input)
+		serverClient.Command, err = getCommand(serverClient.Input)
+
+		if err != nil {
+			return "", err
+		}
 
 		log.WithFields(log.Fields{
 			"event":         fmt.Sprintf("client_command_%s", serverClient.Command),
@@ -46,7 +50,10 @@ func getCommand(input string) (string, error) {
 	// Split the input string into a slice by spaces
 	inputSlice := strings.Split(input, " ")
 
-	// TODO: check this index exists and return an err if not
+	if len(inputSlice) < 1 {
+		return "", fmt.Errorf("Unable to determine command")
+	}
+
 	return inputSlice[0], nil
 }
 
