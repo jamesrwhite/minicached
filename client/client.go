@@ -25,7 +25,6 @@ const STATE_COMMAND_QUIT uint8 = 6
 const STATE_COMMAND_FLUSH_ALL uint8 = 7
 
 // Reset a clients state to what it would be on first connection
-// TODO: move to client package
 func (client *Client) Reset() {
 	log.WithFields(log.Fields{
 		"event":         "client_reset",
