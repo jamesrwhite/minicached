@@ -155,9 +155,6 @@ func processStateCommandGet(serverClient *client.Client) (string, error) {
 		return response, nil
 	}
 
-	// TODO: where should this happen?
-	serverClient.Reset()
-
 	return "", fmt.Errorf("CLIENT_ERROR")
 }
 
@@ -232,9 +229,6 @@ func processStateCommandDelete(serverClient *client.Client) (string, error) {
 
 	}
 
-	// TODO: where should this happen?
-	serverClient.Reset()
-
 	return "", fmt.Errorf("CLIENT_ERROR")
 }
 
@@ -254,9 +248,6 @@ func processStateCommandFlushAll(serverClient *client.Client) (string, error) {
 		delay, err := strconv.ParseInt(inputSlice[1], 10, 64)
 
 		if err != nil {
-			// TODO: where should this happen?
-			serverClient.Reset()
-
 			return "", fmt.Errorf("CLIENT_ERROR")
 		}
 
@@ -265,9 +256,6 @@ func processStateCommandFlushAll(serverClient *client.Client) (string, error) {
 
 	// Reset the datastore
 	memory.Flush()
-
-	// TODO: where should this happen?
-	serverClient.Reset()
 
 	return "OK\n", nil
 }
