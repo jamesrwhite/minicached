@@ -23,8 +23,7 @@ func Listen(port int) {
 	// Initialise the store
 	log.Info("Initialising memory store")
 
-	// Start the server on port 5268
-	log.Info("Listening on port 5268")
+	log.Infof("Listening on port %d", port)
 	server, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 
 	if err != nil {
