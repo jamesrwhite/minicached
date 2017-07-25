@@ -32,10 +32,10 @@ func Set(key, value string, length, flags, ttl int64) {
 	defer lock.Unlock()
 
 	memoryStore[key] = store.Record{
-		Key: key,
-		Value: value,
-		Flags: flags,
-		Ttl: ttl,
+		Key:    key,
+		Value:  value,
+		Flags:  flags,
+		Ttl:    ttl,
 		Length: length,
 	}
 }
