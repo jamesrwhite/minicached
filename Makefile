@@ -11,5 +11,8 @@ build:
 run: build
 	./minicached
 
+connect:
+	telnet localhost 5268
+
 install:
 	go install
