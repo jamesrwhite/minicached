@@ -20,9 +20,6 @@ import (
 var serverClients map[string]*client.Client
 
 func Listen(port int) {
-	// Initialise the store
-	log.Info("Initialising memory store")
-
 	log.Infof("Listening on port %d", port)
 	server, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 

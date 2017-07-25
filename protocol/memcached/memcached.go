@@ -11,6 +11,10 @@ import (
 	"github.com/jamesrwhite/minicached/store/memory"
 )
 
+func init() {
+	log.Info("Initialising memcached protocol parser")
+}
+
 func Process(serverClient *client.Client) (response string, err error) {
 	// Determine the clients state based on the command unless
 	// we're in the state of waiting for a value
