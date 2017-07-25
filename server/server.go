@@ -114,7 +114,7 @@ func process(connection net.Conn) {
 		response, err := memcached.Process(serverClient)
 
 		if err != nil {
-			fmt.Fprintln(serverClient.Connection, err)
+			fmt.Fprint(serverClient.Connection, memcached.Error(err))
 
 			// An error occured so reset the client state
 			serverClient.Reset()
@@ -137,7 +137,7 @@ func process(connection net.Conn) {
 			"connection_id": serverClient.Id,
 		}).Debug(fmt.Sprintf("Client Scan Error: %s", err.Error()))
 
-		fmt.Fprintln(serverClient.Connection, "ERROR ", err)
+		fmt.Fprint(serverClient.Connection, memcached.Error(err))
 
 		serverClient.Reset()
 	}

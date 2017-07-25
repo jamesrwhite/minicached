@@ -50,6 +50,10 @@ func Process(serverClient *client.Client) (response string, err error) {
 	return dispatch(serverClient)
 }
 
+func Error(err error) string {
+	return fmt.Sprintf("ERROR %s\n", err.Error())
+}
+
 func getCommand(input string) (string, error) {
 	// Split the input string into a slice by spaces
 	inputSlice := strings.Split(input, " ")
